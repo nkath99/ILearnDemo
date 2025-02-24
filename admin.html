@@ -8,10 +8,22 @@
 <body>
     <div class="container text-center">
         <h1>Admin Dashboard</h1>
-        <button class="btn btn-primary m-2">Manage Users</button>
-        <button class="btn btn-secondary m-2">View Reports</button>
+
+        <!-- Manage Users Section -->
+        <h3>Manage Users</h3>
+        <ul id="userList" class="list-group mb-3"></ul>
+        <input type="text" id="userInput" class="form-control mb-2" placeholder="Enter user name">
+        <button class="btn btn-primary m-2" onclick="addUser()">Add User</button>
+
+        <!-- View Reports Section -->
+        <h3>View Reports</h3>
+        <ul id="reportList" class="list-group mb-3"></ul>
+        <button class="btn btn-secondary m-2" onclick="viewReports()">Show Reports</button>
+
         <br><br>
         <a href="index.html" class="btn btn-danger">Back to Home</a>
     </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>

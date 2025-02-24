@@ -8,11 +8,26 @@
 <body>
     <div class="container text-center">
         <h1>Student Dashboard</h1>
-        <button class="btn btn-primary m-2">View Assignments</button>
-        <button class="btn btn-secondary m-2">Submit Assignment</button>
-        <button class="btn btn-info m-2">Check Grades</button>
+
+        <!-- View Assignments Section -->
+        <h3>Assignments</h3>
+        <ul id="studentAssignmentList" class="list-group mb-3"></ul>
+        <button class="btn btn-primary m-2" onclick="viewAssignments()">View Assignments</button>
+
+        <!-- Submit Assignment Section -->
+        <h3>Submit Assignment</h3>
+        <input type="text" id="submissionInput" class="form-control mb-2" placeholder="Enter assignment name">
+        <button class="btn btn-secondary m-2" onclick="submitAssignment()">Submit Assignment</button>
+
+        <!-- Check Grades Section -->
+        <h3>Grades</h3>
+        <ul id="studentGradesList" class="list-group mb-3"></ul>
+        <button class="btn btn-info m-2" onclick="manageGrades()">Check Grades</button>
+
         <br><br>
         <a href="index.html" class="btn btn-danger">Back to Home</a>
     </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>
