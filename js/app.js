@@ -9,6 +9,46 @@ let reports = ["Report 1: System Analysis", "Report 2: User Activity", "Report 3
 
 let redirectUrl = ""; // Store the URL for redirection after login
 
+// ===================== Toast Notification Functionality =====================
+function showToast(message, type = "info") {
+    const toastContainer = document.getElementById("toastContainer");
+    if (toastContainer) {
+        // Create the toast element
+        const toastEl = document.createElement("div");
+        toastEl.className = "toast align-items-center text-bg-" + type + " border-0";
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
+        toastEl.innerHTML = `
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        `;
+        toastContainer.appendChild(toastEl);
+
+        // Initialize and show the toast
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        bsToast.show();
+        
+        // Remove toast from DOM when hidden
+        toastEl.addEventListener("hidden.bs.toast", function () {
+            toastEl.remove();
+        });
+    }
+}
+// ===================== Dark Mode Toggle =====================
+    // Attach dark mode toggle event if the toggle button exists
+document.addEventListener("DOMContentLoaded", function() {
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("click", function() {
+            document.body.classList.toggle("dark-mode");
+        });
+    }
+});
 // ===================== Username & Password Prompt (Login Page) =====================
 
 // Function to show the login modal
