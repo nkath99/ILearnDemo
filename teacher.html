@@ -1,71 +1,182 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Teacher Dashboard</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="index.html">iLearn</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                  aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-             <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-             <ul class="navbar-nav me-auto">
-               <li class="nav-item">
-                 <a class="nav-link" href="admin.html">Admin</a>
-               </li>
-               <li class="nav-item">
-                 <a class="nav-link" href="teacher.html">Teacher</a>
-               </li>
-               <li class="nav-item">
-                 <a class="nav-link" href="student.html">Student</a>
-               </li>
-            </ul>
-            <button class="btn btn-outline-secondary" id="darkModeToggle">Toggle Dark Mode</button>
-        </div>
-      </div>
-    </nav>
-    <!-- Toast container for notifications -->
-    <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
-      </div>
-
-    <div class="container text-center">
-        <h1>Teacher Dashboard</h1>
-
-        <!-- Add Assignment Section -->
-        <h3>Assignments</h3>
-        <ul id="assignmentList" class="list-group mb-3"></ul>
-
-        <input type="text" id="assignmentInput" class="form-control mb-2" placeholder="Enter assignment name">
-        <button class="btn btn-primary m-2" onclick="addAssignment()">Add Assignment</button>
-
-        <!-- Manage Grades Section -->
-        <h3>Manage Grades</h3>
-        <ul id="gradesList" class="list-group mb-3"></ul>
-        <button class="btn btn-info m-2" onclick="manageGrades()">View Grades</button>
-
-        <!-- View Student Submissions Section -->
-        <h3>Student Submissions</h3>
-        <ul id="submissionList" class="list-group mb-3"></ul>
-        <button class="btn btn-warning m-2" onclick="viewSubmissions()">View Submissions</button>
-
-        <br><br>
-        <a href="index.html" class="btn btn-danger">Back to Home</a>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">iLearn</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+       <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+       <ul class="navbar-nav me-auto">
+         <li class="nav-item">
+         <a class="nav-link" href="admin.html">Admin</a>
+         </li>
+         <li class="nav-item">
+         <a class="nav-link" href="teacher.html">Teacher</a>
+         </li>
+         <li class="nav-item">
+         <a class="nav-link" href="student.html">Student</a>
+         </li>
+      </ul>
+      <button class="btn btn-outline-secondary" id="darkModeToggle">Toggle Dark Mode</button>
+    </div>
+    </div>
+  </nav>
+  <!-- Toast container for notifications -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
     </div>
 
-    <script> src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
-    <script>
-        // Dark mode toggle
-        document.getElementById("darkModeToggle").addEventListener("click", function() {
-            document.body.classList.toggle("dark-mode");
-        });
-    </script>
+  <div class="container text-center">
+    <h1>Teacher Dashboard</h1>
+
+    <!-- Add Assignment Section -->
+    <h3>Assignments</h3>
+    <ul id="assignmentList" class="list-group mb-3"></ul>
+
+    <input type="text" id="assignmentNameInput" class="form-control mb-2" placeholder="Enter assignment name" required>
+    <input type="date" id="assignmentDueDateInput" class="form-control mb-2" required>
+    <textarea id="assignmentDescriptionInput" class="form-control mb-2" placeholder="Enter assignment description (optional)"></textarea>
+    <button class="btn btn-primary m-2" onclick="addAssignment()">Add Assignment</button>
+
+    <!-- Manage Grades Section -->
+    <h3>Manage Grades</h3>
+    <ul id="gradesList" class="list-group mb-3"></ul>
+    <button class="btn btn-info m-2" onclick="manageGrades()">View Grades</button>
+
+    <!-- View Student Submissions Section -->
+    <h3>Student Submissions</h3>
+    <ul id="submissionList" class="list-group mb-3"></ul>
+    <button class="btn btn-warning m-2" onclick="viewSubmissions()">View Submissions</button>
+
+    <br><br>
+    <a href="index.html" class="btn btn-danger">Back to Home</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Dark mode toggle
+    document.getElementById("darkModeToggle").addEventListener("click", function() {
+      document.body.classList.toggle("dark-mode");
+    });
+
+    // Add Assignment Functionality
+    function addAssignment() {
+      const name = document.getElementById("assignmentNameInput").value.trim();
+      const dueDate = document.getElementById("assignmentDueDateInput").value;
+      const description = document.getElementById("assignmentDescriptionInput").value.trim();
+
+      if (!name || !dueDate) {
+        alert("Assignment name and due date are required.");
+        return;
+      }
+
+      const assignmentList = document.getElementById("assignmentList");
+
+      const listItem = document.createElement("li");
+      listItem.className = "list-group-item";
+
+      const formattedDate = new Date(dueDate).toLocaleDateString("en-US");
+
+      const assignmentHeader = document.createElement("div");
+      assignmentHeader.innerHTML = `<strong>${name}</strong> - Due: ${formattedDate}`;
+      listItem.appendChild(assignmentHeader);
+
+      // Add Edit and Remove buttons
+      const editButton = document.createElement("button");
+      editButton.className = "btn btn-warning btn-sm m-1";
+      editButton.textContent = "Edit";
+      editButton.onclick = function () {
+        const newName = prompt("Enter new assignment name:", name);
+        const newDueDate = prompt("Enter new due date:", dueDate);
+        const newDescription = prompt("Enter new description:", description);
+
+        if (newName && newDueDate) {
+          const newFormattedDate = new Date(newDueDate).toLocaleDateString("en-US");
+          assignmentHeader.innerHTML = `<strong>${newName}</strong> - Due: ${newFormattedDate}`;
+          if (newDescription) {
+            if (!descriptionToggle) {
+              descriptionToggle = document.createElement("button");
+              descriptionToggle.className = "btn btn-primary btn-sm m-1";
+              descriptionToggle.textContent = "Description";
+              descriptionToggle.setAttribute("data-bs-toggle", "collapse");
+              descriptionToggle.setAttribute("data-bs-target", `#desc-${newName.replace(/\s+/g, '-')}`);
+              listItem.insertBefore(descriptionToggle, editButton); // Move to the left of Edit and Remove buttons
+            }
+            if (!descriptionContent) {
+              descriptionContent = document.createElement("div");
+              descriptionContent.className = "collapse";
+              descriptionContent.id = `desc-${newName.replace(/\s+/g, '-')}`;
+              listItem.appendChild(descriptionContent);
+            }
+            descriptionContent.textContent = newDescription;
+            descriptionContent.classList.add("show"); // Show the updated description
+          }
+          listItem.setAttribute("data-due-date", newDueDate);
+          sortAssignments();
+        } else {
+          alert("Name and due date are required.");
+        }
+      };
+      listItem.appendChild(editButton);
+
+      const removeButton = document.createElement("button");
+      removeButton.className = "btn btn-danger btn-sm m-1";
+      removeButton.textContent = "Remove";
+      removeButton.onclick = function () {
+        if (confirm("Are you sure you want to remove this assignment?")) {
+          assignmentList.removeChild(listItem);
+        }
+      };
+      listItem.appendChild(removeButton);
+
+      let descriptionToggle, descriptionContent;
+      if (description) {
+        descriptionToggle = document.createElement("button");
+        descriptionToggle.className = "btn btn-primary btn-sm m-1";
+        descriptionToggle.textContent = "Description";
+        descriptionToggle.setAttribute("data-bs-toggle", "collapse");
+        descriptionToggle.setAttribute("data-bs-target", `#desc-${name.replace(/\s+/g, '-')}`);
+        listItem.insertBefore(descriptionToggle, editButton); // Move to the left of Edit and Remove buttons
+
+        descriptionContent = document.createElement("div");
+        descriptionContent.className = "collapse mt-2";
+        descriptionContent.id = `desc-${name.replace(/\s+/g, '-')}`;
+        descriptionContent.textContent = description;
+        listItem.appendChild(descriptionContent);
+      }
+
+      listItem.setAttribute("data-due-date", dueDate);
+      assignmentList.appendChild(listItem);
+      sortAssignments();
+
+      // Clear input fields
+      document.getElementById("assignmentNameInput").value = "";
+      document.getElementById("assignmentDueDateInput").value = "";
+      document.getElementById("assignmentDescriptionInput").value = "";
+    }
+
+    // Sort assignments by due date
+    function sortAssignments() {
+      const assignmentList = document.getElementById("assignmentList");
+      const assignments = Array.from(assignmentList.children);
+
+      assignments.sort((a, b) => {
+        const dateA = new Date(a.getAttribute("data-due-date"));
+        const dateB = new Date(b.getAttribute("data-due-date"));
+        return dateA - dateB;
+      });
+
+      assignments.forEach(assignment => assignmentList.appendChild(assignment));
+    }
+  </script>
 </body>
-</html>

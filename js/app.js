@@ -1,7 +1,7 @@
 console.log("App is running");
 
 // Mock data
-let assignments = ["Math Homework", "Science Project"];
+let assignments = JSON.parse(localStorage.getItem("assignments")) || [];
 let grades = { "John Doe": "A", "Jane Smith": "B", "Mark Johnson": "C" };
 let submissions = ["Essay by Jane", "Project by John", "Homework by Mark"];
 let users = ["Admin User", "Teacher User", "Student User"];
@@ -98,6 +98,7 @@ function addAssignment() {
         const assignmentName = input.value.trim();
         if (assignmentName) {
             assignments.push(assignmentName);
+            localStorage.setItem("assignments", JSON.stringify(assignments)); // Save to localStorage
             input.value = "";
             renderAssignments();
         } else {
@@ -109,6 +110,7 @@ function addAssignment() {
 // Function to remove an assignment (Teacher Dashboard)
 function removeAssignment(index) {
     assignments.splice(index, 1);
+    localStorage.setItem("assignments", JSON.stringify(assignments)); // Save to localStorage
     renderAssignments();
 }
 
