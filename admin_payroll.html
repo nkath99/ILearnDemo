@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Payroll</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      /* Dollar animation effect */
+      .dollar-animation {
+          position: absolute;
+          font-size: 2em;
+          color: green;
+          animation: fadeOut 2s forwards;
+          pointer-events: none;
+      }
+      @keyframes fadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+      }
+      /* Blue effect for deduction */
+      .blue-effect {
+          background-color: blue !important;
+          color: white;
+      }
+    </style>
+</head>
+<body>
+    <!-- Admin-specific Navbar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="admin.html">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNavbar">
+           <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+               <a class="nav-link" href="admin_teachers.html">Teachers List</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link active" href="admin_payroll.html">Payroll</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="admin_hello.html">Hello Admin</a>
+             </li>
+           </ul>
+           <button class="btn btn-outline-secondary" onclick="confirmLogout();">Logout</button>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Toast container -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+      <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+    </div>
+    
+    <div class="container mt-4">
+        <h1>Payroll</h1>
+        <table class="table table-bordered" id="payrollTable">
+          <thead>
+            <tr>
+              <th>Teacher Name</th>
+              <th>Base Salary</th>
+              <th>Bonus</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Payroll rows will be injected here -->
+          </tbody>
+        </table>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function confirmLogout(e) {
+          if(confirm("Are you sure you want to logout?")) {
+              localStorage.removeItem("isLoggedIn");
+              window.location.href = "index.html";
+          } else {
+              if(e) e.preventDefault();
+              return false;
+          }
+      }
+      
+      // Use the same getTeachersData function to read data from localStorage.
+      function getTeachersData() {
+          let data = localStorage.getItem("teachersData");
+          return data ? JSON.parse(data) : [];
+      }
+      
+      function saveTeachersData(data) {
+          localStorage.setItem("teachersData", JSON.stringify(data));
+      }
+      
+      // Render the payroll table using the teacher data.
+      function renderPayrollTable() {
+          let teachers = getTeachersData();
+          let tbody = document.querySelector("#payrollTable tbody");
+          tbody.innerHTML = "";
+          teachers.forEach((teacher, index) => {
+              let total = teacher.baseSalary + teacher.bonus;
+              let row = document.createElement("tr");
+              row.innerHTML = `
+                  <td>${teacher.name}</td>
+                  <td>$${teacher.baseSalary}</td>
+                  <td>$${teacher.bonus}</td>
+                  <td>$${total}</td>
+                  <td>
+                      <button class="btn btn-sm btn-success me-1" onclick="increaseSalary(${index}, this)">Increase Salary</button>
+                      <button class="btn btn-sm btn-primary" onclick="deductPay(${index}, this)">Deduct Pay</button>
+                  </td>
+              `;
+              tbody.appendChild(row);
+          });
+      }
+      
+      // Increase salary: adds $100 to baseSalary and shows a dollar animation.
+      function increaseSalary(index, btn) {
+          let teachers = getTeachersData();
+          teachers[index].baseSalary += 100;
+          saveTeachersData(teachers);
+          renderPayrollTable();
+          let dollarDiv = document.createElement("div");
+          dollarDiv.className = "dollar-animation";
+          dollarDiv.innerHTML = "$$$";
+          let rect = btn.getBoundingClientRect();
+          dollarDiv.style.left = rect.left + "px";
+          dollarDiv.style.top = (rect.top - 30) + "px";
+          document.body.appendChild(dollarDiv);
+          setTimeout(() => { dollarDiv.remove(); }, 2000);
+      }
+      
+      // Deduct pay: subtracts $100 from baseSalary (not below zero) and highlights the row in blue.
+      function deductPay(index, btn) {
+          let teachers = getTeachersData();
+          teachers[index].baseSalary = Math.max(0, teachers[index].baseSalary - 100);
+          saveTeachersData(teachers);
+          let row = btn.closest("tr");
+          row.classList.add("blue-effect");
+          setTimeout(() => { row.classList.remove("blue-effect"); }, 2000);
+          renderPayrollTable();
+      }
+      
+      window.addEventListener("load", function() {
+          renderPayrollTable();
+      });
+    </script>
+</body>
+</html>
