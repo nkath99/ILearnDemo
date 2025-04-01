@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Teachers List</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Simple fire effect animation */
+        .fire-effect {
+            animation: fireAnimation 5s forwards;
+        }
+        @keyframes fireAnimation {
+            0% { background-color: #ffffff; }
+            25% { background-color: #ff4500; }
+            50% { background-color: #ff8c00; }
+            75% { background-color: #ff4500; }
+            100% { background-color: #ffffff; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin-specific Navbar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="admin.html">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNavbar">
+           <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+               <a class="nav-link active" href="admin_teachers.html">Teachers List</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="admin_payroll.html">Payroll</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="admin_hello.html">Hello Admin</a>
+             </li>
+           </ul>
+           <button class="btn btn-outline-secondary" onclick="confirmLogout();">Logout</button>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Toast container -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+      <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+    </div>
+    
+    <div class="container mt-4">
+        <h1>Teachers List</h1>
+        <!-- Hire Teacher Section -->
+        <div class="mb-3">
+            <input type="text" id="newTeacherName" class="form-control" placeholder="Enter new teacher's name">
+            <button class="btn btn-success mt-2" onclick="hireTeacher()">Hire Teacher</button>
+        </div>
+        <table id="teachersTable" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Experience</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Table rows rendered dynamically -->
+          </tbody>
+        </table>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Logout function remains unchanged.
+      function confirmLogout(e) {
+          if(confirm("Are you sure you want to logout?")) {
+              localStorage.removeItem("isLoggedIn");
+              window.location.href = "index.html";
+          } else {
+              if(e) e.preventDefault();
+              return false;
+          }
+      }
+      
+      // Updated getTeachersData function that patches missing fields.
+      function getTeachersData() {
+          let data = localStorage.getItem("teachersData");
+          if (data) {
+              let teachers = JSON.parse(data);
+              let updated = false;
+              teachers = teachers.map(teacher => {
+                  // If subject or experience is missing, add defaults
+                  if (!teacher.subject || !teacher.experience) {
+                      updated = true;
+                      // Use defaults for known teachers or a generic fallback.
+                      const defaults = {
+                          "John Doe": { subject: "Mathematics", experience: "5 years", baseSalary: 3000, bonus: 500 },
+                          "Jane Smith": { subject: "Science", experience: "7 years", baseSalary: 3200, bonus: 600 },
+                          "Bob Johnson": { subject: "History", experience: "10 years", baseSalary: 3100, bonus: 550 }
+                      };
+                      return Object.assign({}, teacher, defaults[teacher.name] || { subject: "Unknown", experience: "0 years", baseSalary: 2500, bonus: 400 });
+                  }
+                  return teacher;
+              });
+              if (updated) {
+                  localStorage.setItem("teachersData", JSON.stringify(teachers));
+              }
+              return teachers;
+          } else {
+              // Initialize default data if none exists.
+              let defaultTeachers = [
+                  { name: "John Doe", subject: "Mathematics", experience: "5 years", baseSalary: 3000, bonus: 500 },
+                  { name: "Jane Smith", subject: "Science", experience: "7 years", baseSalary: 3200, bonus: 600 },
+                  { name: "Bob Johnson", subject: "History", experience: "10 years", baseSalary: 3100, bonus: 550 },
+                  { name: "Alice Brown", subject: "English", experience: "3 years", baseSalary: 2800, bonus: 400 },
+                  { name: "Michael Lee", subject: "Computer Science", experience: "8 years", baseSalary: 3500, bonus: 700 },
+                  { name: "Sarah White", subject: "Biology", experience: "6 years", baseSalary: 3000, bonus: 500 }
+              ];
+              localStorage.setItem("teachersData", JSON.stringify(defaultTeachers));
+              return defaultTeachers;
+          }
+      }
+      
+      // Save teacher data to localStorage.
+      function saveTeachersData(data) {
+          localStorage.setItem("teachersData", JSON.stringify(data));
+      }
+      
+      // Render the teachers table.
+      function renderTeachersTable() {
+          let teachers = getTeachersData();
+          let tbody = document.querySelector("#teachersTable tbody");
+          tbody.innerHTML = "";
+          teachers.forEach((teacher, index) => {
+              let row = document.createElement("tr");
+              row.innerHTML = `
+                  <td>${teacher.name}</td>
+                  <td>${teacher.subject}</td>
+                  <td>${teacher.experience}</td>
+                  <td><button class="btn btn-danger" onclick="fireTeacher(${index})">Fire</button></td>
+              `;
+              tbody.appendChild(row);
+          });
+      }
+      
+      function hireTeacher() {
+          var teacherName = document.getElementById("newTeacherName").value.trim();
+          if (!teacherName) {
+              alert("Please enter a teacher name.");
+              return;
+          }
+          var subjects = ["Mathematics", "Science", "History", "English", "Computer Science", "Biology", "Economics", "Art"];
+          var randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
+          var randomYears = Math.floor(Math.random() * 15) + 1;
+          var experience = randomYears + " years";
+          // Generate random base salary (between 2500 and 4000) and bonus (between 400 and 800)
+          var baseSalary = Math.floor(Math.random() * 1500) + 2500;
+          var bonus = Math.floor(Math.random() * 400) + 400;
+          var newTeacher = {
+              name: teacherName,
+              subject: randomSubject,
+              experience: experience,
+              baseSalary: baseSalary,
+              bonus: bonus
+          };
+          let teachers = getTeachersData();
+          teachers.push(newTeacher);
+          saveTeachersData(teachers);
+          renderTeachersTable();
+          document.getElementById("newTeacherName").value = "";
+      }
+      
+      function fireTeacher(index) {
+          let teachers = getTeachersData();
+          // Trigger fire effect on body.
+          document.body.classList.add("fire-effect");
+          // Remove the teacher at the given index.
+          teachers.splice(index, 1);
+          saveTeachersData(teachers);
+          renderTeachersTable();
+          // Remove the fire effect after 5 seconds.
+          setTimeout(() => { document.body.classList.remove("fire-effect"); }, 5000);
+      }
+      
+      // Render the teacher list on page load.
+      window.addEventListener("load", function() {
+          renderTeachersTable();
+      });
+    </script>
+</body>
+</html>

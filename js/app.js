@@ -66,10 +66,11 @@ function processLogin(event) {
     const password = document.getElementById("password").value.trim();
 
     if (username && password) {
-        alert(`Welcome, ${username}!`);
+        localStorage.setItem("isloggedIn", true);
+        showToast(`Welcome, ${username}!`, "success");
         window.location.href = redirectUrl;
     } else {
-        alert("Please enter both username and password.");
+        showToast("Please enter both username and password.", "danger");
     }
 }
 

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../iLearn-UImock"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "ILearn"
+	}
+}
