@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Assignments</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f0f2f5; }
+    .card-header { background-color: #007bff; color: white; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="student_assignments.html">Assignments</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#studentNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="studentNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link active" href="student_assignments.html">Assignments</a></li>
+          <li class="nav-item"><a class="nav-link" href="student_submit.html">Submit</a></li>
+          <li class="nav-item"><a class="nav-link" href="student_grades.html">Grades</a></li>
+        </ul>
+        <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+    <!-- Toast container -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+  </div>
+
+  <div class="container mt-5">
+    <h1 id="pageTitle" class="mb-4 text-center">Assignments</h1>
+    <div class="row" id="assignmentsRow"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const student = localStorage.getItem("currentStudent") || "Student";
+      document.getElementById("pageTitle")
+              .textContent = `Assignments for ${student}`;
+
+      const assignments = JSON.parse(
+        localStorage.getItem("teacherAssignments")
+      ) || [];
+
+      const row = document.getElementById("assignmentsRow");
+      assignments.forEach(a => {
+        const col = document.createElement("div");
+        col.className = "col-md-4 mb-4";
+        const due = new Date(a.dueDate)
+                      .toLocaleDateString("en-US");
+        col.innerHTML = `
+          <div class="card h-100">
+            <div class="card-header">
+              <h5 class="card-title mb-1">${a.name}</h5>
+              <small>Due: ${due}</small>
+            </div>
+            <div class="card-body">
+              <p class="card-text">${a.description || ""}</p>
+            </div>
+          </div>`;
+        row.appendChild(col);
+      });
+
+      if (!assignments.length) {
+        row.innerHTML = `
+          <div class="col-12">
+            <p class="text-center text-muted">No assignments available.</p>
+          </div>`;
+      }
+    });
+  </script>
+</body>
+</html>

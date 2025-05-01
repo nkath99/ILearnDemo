@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher – Class List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .card-period { border-radius: 1rem; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1); }
+    .card-header { background-color: #0d6efd; color: #fff; font-weight: 500; }
+    .student-list { list-style: none; padding-left: 0; }
+    .student-list li { padding: .25rem 0; border-bottom: 1px solid #e9ecef; }
+    .student-list li:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="teacher.html">Teacher Dashboard</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link" href="teacher.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="teacher_classlist.html">Class List</a></li>
+          <li class="nav-item"><a class="nav-link" href="teacher_assignments.html">Assignments</a></li>
+          <li class="nav-item"><a class="nav-link" href="teacher_submissions.html">Submissions</a></li>
+        </ul>
+        <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Title -->
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Your Period Classes</h1>
+    <div class="row" id="periodCards"></div>
+  </div>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    (function() {
+      // Define periods and times
+      const periods = [
+        { name: "Period 1", time: "8:00 AM – 9:00 AM" },
+        { name: "Period 2", time: "9:15 AM – 10:15 AM" },
+        { name: "Period 3", time: "10:30 AM – 11:30 AM" }
+      ];
+
+      // Pool of possible student names
+      const possibleNames = [
+        "John","Mary","Alex","Lisa",
+        "Robert","Sophia","Daniel","Emma",
+        "Michael","Olivia","David","Ava",
+        "Ethan","Isabella","Noah","Mia",
+        "Liam","Charlotte","Lucas","Harper"
+      ];
+
+      // Utility: shuffle an array in-place
+      function shuffle(arr) {
+        for (let i=arr.length-1; i>0; i--) {
+          const j = Math.floor(Math.random()*(i+1));
+          [arr[i],arr[j]] = [arr[j],arr[i]];
+        }
+      }
+
+      // Build and persist the class list
+      const classLists = {};
+      periods.forEach(p => {
+        const names = possibleNames.slice();
+        shuffle(names);
+        classLists[p.name] = names.slice(0,4);
+      });
+      localStorage.setItem("classListStudents", JSON.stringify(classLists));
+
+      // Render cards
+      const container = document.getElementById("periodCards");
+      periods.forEach(p => {
+        const students = classLists[p.name];
+        const col = document.createElement("div");
+        col.className = "col-md-4 mb-4";
+
+        col.innerHTML = `
+          <div class="card card-period h-100">
+            <div class="card-header text-center">
+              <div>${p.name}</div>
+              <small>${p.time}</small>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-3">Students</h6>
+              <ul class="student-list">
+                ${students.map(s => `<li>${s}</li>`).join("")}
+              </ul>
+            </div>
+          </div>`;
+        container.appendChild(col);
+      });
+    })();
+  </script>
+</body>
+</html>

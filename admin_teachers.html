@@ -65,14 +65,14 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Table rows rendered dynamically -->
+            <!-- Rows will be populated by JavaScript -->
           </tbody>
         </table>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Logout function remains unchanged.
+      
       function confirmLogout(e) {
           if(confirm("Are you sure you want to logout?")) {
               localStorage.removeItem("isLoggedIn");
@@ -83,7 +83,7 @@
           }
       }
       
-      // Updated getTeachersData function that patches missing fields.
+        // Function to get teacher data from localStorage or initialize it if not present.
       function getTeachersData() {
           let data = localStorage.getItem("teachersData");
           if (data) {
@@ -154,7 +154,7 @@
           var randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
           var randomYears = Math.floor(Math.random() * 15) + 1;
           var experience = randomYears + " years";
-          // Generate random base salary (between 2500 and 4000) and bonus (between 400 and 800)
+            // Random base salary between $2500 and $4000, and bonus between $400 and $800.
           var baseSalary = Math.floor(Math.random() * 1500) + 2500;
           var bonus = Math.floor(Math.random() * 400) + 400;
           var newTeacher = {

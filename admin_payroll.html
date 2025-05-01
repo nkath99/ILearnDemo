@@ -67,7 +67,7 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Payroll rows will be injected here -->
+            <!-- Rows will be populated by JavaScript -->
           </tbody>
         </table>
     </div>
@@ -84,7 +84,7 @@
           }
       }
       
-      // Use the same getTeachersData function to read data from localStorage.
+      
       function getTeachersData() {
           let data = localStorage.getItem("teachersData");
           return data ? JSON.parse(data) : [];
@@ -94,7 +94,7 @@
           localStorage.setItem("teachersData", JSON.stringify(data));
       }
       
-      // Render the payroll table using the teacher data.
+      
       function renderPayrollTable() {
           let teachers = getTeachersData();
           let tbody = document.querySelector("#payrollTable tbody");
@@ -132,7 +132,7 @@
           setTimeout(() => { dollarDiv.remove(); }, 2000);
       }
       
-      // Deduct pay: subtracts $100 from baseSalary (not below zero) and highlights the row in blue.
+      // Deduct pay: subtracts $100 from baseSalary and adds a blue effect to the row.
       function deductPay(index, btn) {
           let teachers = getTeachersData();
           teachers[index].baseSalary = Math.max(0, teachers[index].baseSalary - 100);

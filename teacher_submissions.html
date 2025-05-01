@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher – Submissions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .list-group-item { cursor: default; }
+    .grader-pane { background: #fff; padding: 1rem; margin-top: .5rem; border-radius: .25rem; box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+    <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="teacher.html">Teacher Dashboard</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link" href="teacher.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="teacher_classlist.html">Class List</a></li>
+          <li class="nav-item"><a class="nav-link" href="teacher_assignments.html">Assignments</a></li>
+          <li class="nav-item"><a class="nav-link active" href="teacher_submissions.html">Submissions</a></li>
+          <li class="nav-item"><a class="nav-link" href="teacher_misc.html">Misc</a></li>
+        </ul>
+        <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Student Submissions</h1>
+    <div id="submissionList" class="list-group"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    // Load and render all submissions
+    window.addEventListener("load", () => {
+      const recs = JSON.parse(localStorage.getItem("submissionRecords")) || [];
+      const list = document.getElementById("submissionList");
+      if (!recs.length) {
+        list.innerHTML = `<div class="text-center text-muted">No submissions yet.</div>`;
+        return;
+      }
+      recs.forEach((r, i) => {
+        const item = document.createElement("div");
+        item.className = "list-group-item";
+        item.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${r.assignment}</strong> by <em>${r.student}</em><br>
+              File: ${r.file}
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="toggleGrader(${i})">
+              ${r.grade || r.comment ? "Edit" : "Grade"}
+            </button>
+          </div>
+          <div id="grader-${i}" class="grader-pane" style="display:none;">
+            <div class="mb-2">
+              <label for="gradeInput-${i}" class="form-label">Grade:</label>
+              <input type="text" id="gradeInput-${i}" class="form-control" value="${r.grade || ""}">
+            </div>
+            <div class="mb-2">
+              <label for="commentInput-${i}" class="form-label">Comments:</label>
+              <textarea id="commentInput-${i}" class="form-control" rows="3">${r.comment || ""}</textarea>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="saveGrade(${i})">Save</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    });
+
+    function toggleGrader(idx) {
+      const pane = document.getElementById(`grader-${idx}`);
+      pane.style.display = pane.style.display === "none" ? "block" : "none";
+    }
+
+    function saveGrade(idx) {
+      const grade = document.getElementById(`gradeInput-${idx}`).value.trim();
+      const comment = document.getElementById(`commentInput-${idx}`).value.trim();
+      const recs = JSON.parse(localStorage.getItem("submissionRecords")) || [];
+      recs[idx].grade   = grade;
+      recs[idx].comment = comment;
+      localStorage.setItem("submissionRecords", JSON.stringify(recs));
+      showToast("Grade & comments saved!", "success");
+      toggleGrader(idx);
+    }
+  </script>
+</body>
+</html>

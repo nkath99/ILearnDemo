@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Assignment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background-color: #f0f2f5; }
+    .hero-card { max-width: 500px; margin: 60px auto; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="student_submit.html">Submit</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#studentNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="studentNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="student_assignments.html">Assignments</a></li>
+          <li class="nav-item"><a class="nav-link active" href="student_submit.html">Submit</a></li>
+          <li class="nav-item"><a class="nav-link" href="student_grades.html">Grades</a></li>
+        </ul>
+        <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toast container -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+  </div>
+
+  <div class="card hero-card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-3">Submit Assignment</h3>
+      <p class="text-center text-muted" id="greeting">Hello, Student</p>
+
+      
+      <div id="stage1">
+        <div class="mb-3">
+          <label for="assignmentSelect" class="form-label">Choose Assignment</label>
+          <select id="assignmentSelect" class="form-select">
+            <option value="" disabled selected>Loading…</option>
+          </select>
+        </div>
+        <button class="btn btn-primary w-100" id="nextBtn">Next</button>
+      </div>
+
+      
+      <div id="stage2" style="display:none;">
+        <div class="mb-3">
+          <label for="fileInput" class="form-label">Upload File</label>
+          <input type="file" id="fileInput" class="form-control">
+        </div>
+        <button class="btn btn-success w-100" id="uploadBtn">Upload & Finish</button>
+      </div>
+
+      <div id="uploadInfo" class="mt-3 text-center"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const STORAGE = "submissionRecords";
+    let currentAssignment = "";
+
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    window.addEventListener("load", () => {
+      // Personalize greeting
+      const student = localStorage.getItem("currentStudent") || "Student";
+      document.getElementById("greeting").textContent = `Hello, ${student}`;
+
+      // Populate dropdown from teacherAssignments
+      const assignments = JSON.parse(localStorage.getItem("teacherAssignments")) || [];
+      const select = document.getElementById("assignmentSelect");
+      select.innerHTML = assignments.length
+        ? `<option value="" disabled selected>Select one…</option>` +
+          assignments.map(a =>
+            `<option value="${a.name}">${a.name} (due ${new Date(a.dueDate).toLocaleDateString()})</option>`
+          ).join("")
+        : `<option value="" disabled>No assignments available</option>`;
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const sel = document.getElementById("assignmentSelect");
+      if (!sel.value) return alert("Please select an assignment.");
+      currentAssignment = sel.value;
+      document.getElementById("stage1").style.display = "none";
+      document.getElementById("stage2").style.display = "block";
+    });
+
+    document.getElementById("uploadBtn").addEventListener("click", () => {
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files.length) return alert("Please choose a file.");
+      const fileName = fileInput.files[0].name;
+      const student  = localStorage.getItem("currentStudent") || "Student";
+      // Save record
+      const recs = JSON.parse(localStorage.getItem(STORAGE)) || [];
+      // Random grade generator
+      const grades = ["A","B+","B","C+","C","D","F"];
+      const grade = grades[Math.floor(Math.random()*grades.length)];
+      recs.push({ student, assignment: currentAssignment, file: fileName, grade });
+      localStorage.setItem(STORAGE, JSON.stringify(recs));
+
+      // UX feedback
+      showToast(`Submitted “${currentAssignment}” (${fileName}) — Grade: ${grade}`, "success");
+      document.getElementById("uploadInfo")
+              .innerHTML = `<strong>Uploaded:</strong> ${fileName}`;
+      document.getElementById("uploadBtn").disabled = true;
+    });
+  </script>
+</body>
+</html>

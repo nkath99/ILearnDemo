@@ -7,13 +7,13 @@ let submissions = ["Essay by Jane", "Project by John", "Homework by Mark"];
 let users = ["Admin User", "Teacher User", "Student User"];
 let reports = ["Report 1: System Analysis", "Report 2: User Activity", "Report 3: Performance Metrics"];
 
-let redirectUrl = ""; // Store the URL for redirection after login
+let redirectUrl = "";
 
 // ===================== Toast Notification Functionality =====================
 function showToast(message, type = "info") {
     const toastContainer = document.getElementById("toastContainer");
     if (toastContainer) {
-        // Create the toast element
+        
         const toastEl = document.createElement("div");
         toastEl.className = "toast align-items-center text-bg-" + type + " border-0";
         toastEl.setAttribute("role", "alert");
@@ -29,7 +29,7 @@ function showToast(message, type = "info") {
         `;
         toastContainer.appendChild(toastEl);
 
-        // Initialize and show the toast
+        // Show the toast notification
         const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
         bsToast.show();
         
@@ -40,7 +40,7 @@ function showToast(message, type = "info") {
     }
 }
 // ===================== Dark Mode Toggle =====================
-    // Attach dark mode toggle event if the toggle button exists
+    
 document.addEventListener("DOMContentLoaded", function() {
     const darkModeToggle = document.getElementById("darkModeToggle");
     if (darkModeToggle) {
@@ -60,7 +60,7 @@ function showLoginModal(url) {
 
 // Function to process the login form submission
 function processLogin(event) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault(); // Prevent default form submission
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();

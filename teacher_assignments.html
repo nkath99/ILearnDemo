@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Assignments</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Teacher-specific Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="teacher.html">Teacher Dashboard</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#teacherNavbar">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="teacherNavbar">
+         <ul class="navbar-nav me-auto">
+           <li class="nav-item">
+             <a class="nav-link active" href="teacher_assignments.html">Assignments</a>
+           </li>
+           <li class="nav-item">
+             <a class="nav-link" href="teacher_classlist.html">Class List</a>
+           </li>
+           <li class="nav-item">
+             <a class="nav-link" href="teacher_submissions.html">Submissions</a>
+           </li>
+         </ul>
+         <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toast container for notifications -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+  </div>
+
+  <div class="container text-center">
+    <h1>Teacher Assignments</h1>
+    <h3>Assignments</h3>
+    <ul id="assignmentList" class="list-group mb-3"></ul>
+
+    <input type="text"    id="assignmentNameInput"    class="form-control mb-2" placeholder="Enter assignment name" required>
+    <input type="date"    id="assignmentDueDateInput" class="form-control mb-2" required>
+    <textarea            id="assignmentDescriptionInput" class="form-control mb-2" placeholder="Enter assignment description (optional)"></textarea>
+    <button class="btn btn-primary m-2" onclick="addAssignment()">Add Assignment</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const STORAGE_KEY = "teacherAssignments";
+
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    // Sort assignments by due date
+    function sortAssignments() {
+      const list = document.getElementById("assignmentList");
+      Array.from(list.children)
+           .sort((a,b) => new Date(a.dataset.dueDate) - new Date(b.dataset.dueDate))
+           .forEach(li => list.appendChild(li));
+    }
+
+    // Create and append one list item (shared by load & add)
+    function createAssignmentItem(name, dueDate, description) {
+      const list = document.getElementById("assignmentList");
+      const listItem = document.createElement("li");
+      listItem.className = "list-group-item";
+      listItem.dataset.dueDate = dueDate;
+
+      const formatted = new Date(dueDate).toLocaleDateString("en-US");
+      const header = document.createElement("div");
+      header.innerHTML = `<strong>${name}</strong> – Due: ${formatted}`;
+      listItem.appendChild(header);
+
+      // Edit button (UI only)
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-warning btn-sm m-1";
+      editBtn.textContent = "Edit";
+      editBtn.onclick = () => {
+        const newName = prompt("New assignment name:", name);
+        const newDue  = prompt("New due date (YYYY-MM-DD):", dueDate);
+        const newDesc = prompt("New description:", description);
+        if (newName && newDue) {
+          header.innerHTML = `<strong>${newName}</strong> – Due: ${new Date(newDue).toLocaleDateString("en-US")}`;
+          // Update storage
+          const arr = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+          const idx = arr.findIndex(a => a.name===name && a.dueDate===dueDate);
+          if(idx>-1) {
+            arr[idx] = { name:newName, dueDate:newDue, description:newDesc };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+          }
+          listItem.dataset.dueDate = newDue;
+          sortAssignments();
+        }
+      };
+      listItem.appendChild(editBtn);
+
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "btn btn-danger btn-sm m-1";
+      removeBtn.textContent = "Remove";
+      removeBtn.onclick = () => {
+        if (confirm("Remove this assignment?")) {
+          // UI
+          list.removeChild(listItem);
+          // storage
+          const arr = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+          const filtered = arr.filter(a => !(a.name===name && a.dueDate===dueDate));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+        }
+      };
+      listItem.appendChild(removeBtn);
+
+      // Optional description toggle
+      if (description) {
+        const id = `desc-${name.replace(/\s+/g,'-')}-${dueDate}`;
+        const descBtn = document.createElement("button");
+        descBtn.className = "btn btn-primary btn-sm m-1";
+        descBtn.textContent = "Description";
+        descBtn.setAttribute("data-bs-toggle","collapse");
+        descBtn.setAttribute("data-bs-target",`#${id}`);
+        listItem.insertBefore(descBtn, editBtn);
+
+        const descDiv = document.createElement("div");
+        descDiv.className = "collapse mt-2";
+        descDiv.id = id;
+        descDiv.textContent = description;
+        listItem.appendChild(descDiv);
+      }
+
+      list.appendChild(listItem);
+      sortAssignments();
+    }
+
+    // Load persisted assignments on page load
+    window.addEventListener("load", () => {
+      (JSON.parse(localStorage.getItem(STORAGE_KEY))||[])
+        .forEach(a => createAssignmentItem(a.name,a.dueDate,a.description));
+    });
+
+    // Called by the “Add Assignment” button
+    function addAssignment() {
+      const name = document.getElementById("assignmentNameInput").value.trim();
+      const due  = document.getElementById("assignmentDueDateInput").value;
+      const desc = document.getElementById("assignmentDescriptionInput").value.trim();
+      if (!name || !due) {
+        alert("Name and due date are required.");
+        return;
+      }
+      // persist
+      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+      arr.push({ name, dueDate:due, description:desc });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+      // UI
+      createAssignmentItem(name,due,desc);
+
+      // clear inputs
+      document.getElementById("assignmentNameInput").value = "";
+      document.getElementById("assignmentDueDateInput").value = "";
+      document.getElementById("assignmentDescriptionInput").value = "";
+    }
+  </script>
+</body>
+</html>

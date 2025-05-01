@@ -1,20 +1,101 @@
+/* css/styles.css */
+
+/* Import Google Fonts */
+/* Google Fonts for Poppins */
+
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600&display=swap');
+
+:root {
+  --color-primary: #6D5BBA;
+  --color-secondary: #8D58BF;
+  --color-accent: #DE67A3;
+  --color-light-bg: #f8f9fa;
+  --color-dark-bg: #343a40;
+  --text-light: #f8f9fa;
+  --text-dark: #333;
+  --transition: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-    padding-top: 50px;
-    background-color: #f8f9fa;
-    transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--color-light-bg);
+  color: var(--text-dark);
+  transition: background-color var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+
+.dark-mode {
+  background-color: var(--color-dark-bg);
+  color: var(--text-light);
+}
+
+.login-page {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+}
+
+.login-card h1 {
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+.login-card p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.login-option-btn {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.login-option-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Position the dark-mode button */
+#darkModeToggle {
+  z-index: 1050;
+}
+
+/* Toast & modal backdrop blur */
+.modal-backdrop.show {
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+  .login-card {
+    padding: 1.5rem;
+    margin: 1rem;
   }
-  
-  .dark-mode {
-    background-color: #343a40;
-    color: #f8f9fa;
-  }
-  
-  .dark-mode .navbar {
-    background-color: #495057;
-  }
-  
-  .container {
-    max-width: 600px;
-    margin: auto;
-  }
-  
+}

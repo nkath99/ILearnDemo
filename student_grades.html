@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Grades & Submissions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background-color: #f0f2f5; }
+    .hero-card { max-width: 800px; margin: 60px auto; }
+    .mock-file {
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+      padding: 1rem;
+      border-radius: .25rem;
+      margin-top: .5rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .mock-file del { color: #d9534f; text-decoration: line-through; }
+    .mock-file ins {
+      color: #3c763d;
+      background-color: #dff0d8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="student_grades.html">Grades</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#studentNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="studentNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="student_assignments.html">Assignments</a></li>
+          <li class="nav-item"><a class="nav-link" href="student_submit.html">Submit</a></li>
+          <li class="nav-item"><a class="nav-link active" href="student_grades.html">Grades</a></li>
+        </ul>
+        <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="card hero-card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-3">Your Submissions</h3>
+
+      <!-- DEMO: Switch Student Dropdown -->
+      <div class="mb-3 text-center">
+        <label for="studentSelect" class="form-label">View as:</label>
+        <select id="studentSelect" class="form-select w-auto d-inline-block">
+          <!-- options populated by JS -->
+        </select>
+      </div>
+
+      <p class="text-center text-muted" id="greeting">Hello, Student</p>
+      <div id="gradesContainer"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("isLoggedIn");
+        window.location.href = "index.html";
+      }
+    }
+
+    // render grades for a given student
+    function renderGradesFor(student) {
+      document.getElementById("greeting")
+              .textContent = `Hello, ${student}`;
+      const recs = JSON.parse(localStorage.getItem("submissionRecords")) || [];
+      const mine = recs.filter(r => r.student === student);
+      const container = document.getElementById("gradesContainer");
+      container.innerHTML = "";
+
+      if (!mine.length) {
+        container.innerHTML = `<div class="text-center text-muted">No submissions yet.</div>`;
+        return;
+      }
+
+      mine.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "card mb-4";
+
+        const header = document.createElement("div");
+        header.className = "card-header bg-primary text-white";
+        header.innerHTML = `<strong>${r.assignment}</strong> — Grade: ${r.grade || 'N/A'}`;
+        card.appendChild(header);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        body.innerHTML = `
+          <div><em>File:</em> ${r.file}</div>
+          <div class="mock-file">
+            <del>The quik brown fox</del><br>
+            <ins>The quick brown fox</ins> jumps over the lazy dog.
+          </div>
+          <div class="mt-2"><strong>Comments:</strong> ${r.comment || 'No comments yet.'}</div>
+        `;
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    // on load: populate dropdown and initial render
+    window.addEventListener("load", () => {
+      const recs = JSON.parse(localStorage.getItem("submissionRecords")) || [];
+      const distinctStudents = [...new Set(recs.map(r => r.student))];
+
+      const select = document.getElementById("studentSelect");
+      // add a default “-- choose --” option
+      select.innerHTML = `<option disabled selected value="">-- select student --</option>`;
+      distinctStudents.forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+
+      
+      const current = localStorage.getItem("currentStudent");
+      if (current && distinctStudents.includes(current)) {
+        select.value = current;
+        renderGradesFor(current);
+      }
+
+      // when dropdown changes, rerender
+      select.addEventListener("change", e => {
+        renderGradesFor(e.target.value);
+      });
+    });
+  </script>
+</body>
+</html>
